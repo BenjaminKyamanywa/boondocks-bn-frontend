@@ -74,3 +74,5 @@ export const getBookStatus = (arrivalDate, leaving) => {
 
 	return 'Active';
 };
+
+export const nowSeconds = Math.floor(Date.now() / 1000);

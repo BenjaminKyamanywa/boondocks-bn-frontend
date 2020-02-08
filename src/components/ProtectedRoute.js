@@ -14,6 +14,7 @@ import JWTDecode from 'jwt-decode';
 import toast from '../lib/toast';
 import setAuthenticate from '../store/actions/authenticateAction';
 import { storeToken } from '../helpers/authHelper';
+import { nowSeconds } from "../lib/time";
 
 export const ProtectedRoute = ({
 	setAuthState,
@@ -24,11 +25,8 @@ export const ProtectedRoute = ({
 
 	const {search} = rest.location;
 
-	const hasToken = search.includes('?token=');
-
-	const nowTimeStampSecond = Math.floor(Date.now() / 1000);
-
 	let userData;
+	const hasToken = search.includes('?token=');
 
 	if (hasToken) {
 		const token = search.split('?token=')[1];
@@ -36,16 +34,15 @@ export const ProtectedRoute = ({
 		userData = JWTDecode(token);
 	}
 
-	const isAuthenticated = !!localStorage.bn_user_data || (hasToken && (nowTimeStampSecond - userData.iat < 3));
+	const isAuthenticated = !!localStorage.bn_user_data || (hasToken && (nowSeconds - userData.iat < 3));
 	!isAuthenticated && toast('error', 'You need to be logged in');
-
 
 	return (
 		<Route
 			data-test='protected-route'
 			render={props => ({
 					"1": <Component {...props} />,
-					"0": <Redirect to={{ pathname: "/login", state: { from: props.location } }} />
+					"0": <Redirect to={{ pathname: "/home", state: { from: props.location } }} />
 				}[`${isAuthenticated * 1}`]
 			)}
 			{...rest}
